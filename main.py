@@ -14,8 +14,7 @@ options.add_argument('window-size=1366x768')
 driver = webdriver.Chrome(service=s)
 
 try:
-    driver.get(constants.URL)
-    # ссылка на сайт который парсим
+    driver.get(constants.URL) # ссылка на сайт который парсим
     time.sleep(1)
     while True:
 
