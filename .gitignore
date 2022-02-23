@@ -9,3 +9,5 @@ venv
 out
 gen
 __pycache__/constants.cpython-310.pyc
+build
+dist
