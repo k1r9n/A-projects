@@ -6,8 +6,17 @@ from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 import constants
 import time
+import openpyxl
 import xlrd
 import xlwt
+
+book = openpyxl.Workbook()
+sheet = book.active
+row = 1
+sheet.cell(row=row, column=1).value = 'Адрес'
+sheet.cell(row=row, column=2).value = 'Цена'
+sheet.cell(row=row, column=3).value = 'Ссылка'
+row += 1
 
 s = Service(ChromeDriverManager().install())  # это установка драйвера
 options = webdriver.ChromeOptions()
@@ -16,8 +25,9 @@ options.add_argument('window-size=1366x768')
 driver = webdriver.Chrome(service=s)
 
 try:
-    driver.get(constants.URL) # ссылка на сайт который парсим
+    driver.get(constants.URL)  # ссылка на сайт который парсим
     time.sleep(1)
+    data = []
     while True:
 
         pricelist = driver.find_elements(By.XPATH, constants.pricelist)
@@ -34,9 +44,13 @@ try:
             href += href_xl
         except:
             pass
-        print(len(pricelist))
+        # print(len(pricelist))
         for i in range(len(pricelist)):
-            print(adress[i].text, pricelist[i].text, href[i].get_attribute('href'))
+            data.append([adress[i].text, pricelist[i].text, href[i].get_attribute('href')])
+            # sheet.cell(row=row, column=1).value = adress[i].text
+            # sheet.cell(row=row, column=2).value = pricelist[i].text
+            # sheet.cell(row=row, column=3).value = href[i].get_attribute('href')
+            # print(adress[i].text, pricelist[i].text, href[i].get_attribute('href'))
         time.sleep(1)
         try:
             action = ActionChains(driver)
@@ -44,10 +58,17 @@ try:
             action.move_to_element(element).perform()
             element.click()
             print(driver.current_url)
-            time.sleep(10)
+            time.sleep(5)
         except:
             break
-    time.sleep(10)
+    data.sort(key = lambda x:x[1])
+    for i in range(len(data)):
+        sheet.cell(row=i+2, column=1).value = data[i][0]
+        sheet.cell(row=i+2, column=2).value = data[i][1]
+        sheet.cell(row=i+2, column=3).value = data[i][2]
+
+    book.save("C://Users/k1r9n/Desktop/parser.xlsx")
+    book.close()
 
 except Exception as ex:
     print(ex)
